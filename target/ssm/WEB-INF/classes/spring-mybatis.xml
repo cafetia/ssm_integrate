@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd ">
+
+    <!--6 容器自动扫描IOC组件  -->
+    <context:component-scan base-package="com.ssm"/>
+    <!-- 扫描service包下所有使用注解的类型 -->
+    <!--<context:component-scan base-package="com.ssm.services"/>-->
+    <!-- 扫描dao包下所有使用注解的类型 -->
+    <!--<context:component-scan base-package="com.ssm.dao"/>-->
+    <!-- 扫描util包下所有使用注解的类型 util包下可以通过@Component来声明是一个JavaBean -->
+    <!--<context:component-scan base-package="com.ssm.utils"/>-->
+
+    <!--非扫描的方式-->
+    <!--<bean id = "springAop" class="com.ssm.utils.SpringAop"/>-->
+
+    <!-- 配置数据库相关参数properties的属性：${url} -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="filters" value="stat" />
+        <property name="maxActive" value="20" />
+        <property name="initialSize" value="1" />
+        <property name="maxWait" value="60000" />
+        <property name="minIdle" value="1" />
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="50" />
+    </bean>
+
+    <!-- 配置SqlSessionFactory对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 扫描entities实体类包 使用别名 -->
+        <property name="typeAliasesPackage" value="com.ssm.entities"/>
+        <!-- 扫描sql配置文件:mapper需要的xml文件 -->
+        <property name="mapperLocations" value="classpath:com/ssm/mappers/*Mapper.xml"/>
+    </bean>
+
+    <!-- 配置扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描Dao接口包,只能是对应mapper组件里面的类或接口 -->
+        <property name="basePackage" value="com.ssm.dao"/>
+    </bean>
+
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 配置基于注解的声明式事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- 自动生成所有被 @Aspect 标注修饰的类,标志为切面类 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+
+</beans>

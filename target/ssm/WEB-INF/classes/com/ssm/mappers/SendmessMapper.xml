@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.chatRobot.dao.SendmessDao">
+    <resultMap id="messMap" type="MessageSend">
+        <!--<id column="id" property="id"></id>-->
+        <result column="ID" property="id"></result>
+        <result column="MSGCONTENT" property="MSGCONTENT"></result>
+    </resultMap>
+
+    <select id="srearchMS" resultMap="messMap">
+        SELECT id,msgcontent FROM CUS_SMGP_SEND_DUBBO where flag = 1;
+    </select>
+
+
+    <update id="updateMS" parameterType="int">
+        update CUS_SMGP_SEND_DUBBO
+            set flag = 2
+                where id = #{id}
+    </update>
+
+</mapper>

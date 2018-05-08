@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.ssm.dao.UserDao">
+
+    <select id="getUsers" resultType="com.ssm.entities.User" parameterType="java.lang.Long">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <insert id="addUser" parameterType="com.ssm.entities.User">
+        insert into user(email,password,username,role,status,regIp,regTime)
+              values(#{email},#{password},#{username},#{role},#{status},#{regIp},#{regTime})
+    </insert>
+
+    <update id="updateUser" parameterType="com.ssm.entities.User">
+        update user
+            set email=#{email},
+            password =#{password},
+            username=#{username},
+            role =#{role} ,
+            status = #{status} ,
+            regIp=#{regIp},
+            regTime = #{regTime}
+                where id = #{id}
+    </update>
+
+</mapper>
